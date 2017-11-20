@@ -10,15 +10,15 @@ public class BinN extends Node {
 	}
 
 	public BinN(String content, Node s1, Node s2, Node parent){
-
+		
 		super(content);
 		this.sons[0] = s1;
 		this.sons[1] = s2;
 		this.sons_needed = 2;
 		this.parent = parent;
-
+		
 	}
-
+	
 	@Override
 	public int height() {
 		// TODO Auto-generated method stub
@@ -57,10 +57,10 @@ public class BinN extends Node {
 		if(sons[1] != null){
 			size = size + sons[1].size();
 		}
-
+		
 		return size;
 	}
-
+	
 	@Override
 	public void setSons(Node[] sons) {
 		// TODO Auto-generated method stub
@@ -102,7 +102,7 @@ public class BinN extends Node {
 		// TODO Auto-generated method stub
 		this.sons[idx] = son;
 	}
-
-}
+	
+	}
 
 
