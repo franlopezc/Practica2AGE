@@ -9,13 +9,13 @@ public class UnN extends Node {
 	}
 
 	public UnN(String content, Node s, Node parent){
-		
+
 		super(content);
 		this.sons[0] = s;
 		this.sons_needed = 1;
 		this.parent = parent;
 	}
-	
+
 	@Override
 	public int height() {
 		// TODO Auto-generated method stub
@@ -35,7 +35,7 @@ public class UnN extends Node {
 		}
 		System.out.print(")");
 	}
-	
+
 	public String inorder_string() {
 		// TODO Auto-generated method stub
 		String cadena="";
@@ -55,7 +55,7 @@ public class UnN extends Node {
 		if(sons[0] != null){
 			size = size + sons[0].size();
 		}
-		
+
 		return size;
 	}
 
@@ -75,6 +75,12 @@ public class UnN extends Node {
 	public void setParent(Node parent) {
 		// TODO Auto-generated method stub
 		this.parent = parent;
+	}
+
+	@Override
+	public void setOneSon(Node son, int idx) {
+		// TODO Auto-generated method stub
+		this.sons[idx] = son;
 	}
 
 }

@@ -7,14 +7,14 @@ public class TerminalN extends Node {
 		// TODO Auto-generated constructor stub
 		this(content, null);
 	}
-	
+
 	public TerminalN(String content, Node parent) {
 		// TODO Auto-generated constructor stub
 		super(content);
 		this.sons_needed = 0;
 		this.parent = parent;
 	}
-	
+
 	@Override
 	public int height() {
 		// TODO Auto-generated method stub
@@ -26,7 +26,7 @@ public class TerminalN extends Node {
 		// TODO Auto-generated method stub
 		System.out.print("("+content+")");
 	}
-	
+
 	@Override
 	public String inorder_string() {
 		// TODO Auto-generated method stub
@@ -42,14 +42,14 @@ public class TerminalN extends Node {
 	@Override
 	public void setSons(Node[] sons) {
 		// TODO Auto-generated method stub
-		
+
 		// Won't be used
 	}
 
 	@Override
 	public Node[] getSons() {
 		// TODO Auto-generated method stub
-		
+
 		// Won't be used
 		return null;
 	}
@@ -60,6 +60,11 @@ public class TerminalN extends Node {
 		this.parent = parent;
 	}
 
+	@Override
+	public void setOneSon(Node son, int idx) {
+		// TODO Auto-generated method stub
 
+		// Won't be used
+	}
 
 }
