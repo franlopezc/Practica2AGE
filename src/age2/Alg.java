@@ -43,11 +43,25 @@ public class Alg {
 		
 		//*************************************EVALUATION OF THE POPULATION*************************************
 		
-		/*Double[] eva_puntuacion = new Double[population.size()]; //Save the evaluation of each individual
+		/*
+		Double[] eva_puntuacion = new Double[population.size()]; //Save the evaluation of each individual
 		for (int j = 0; j < population.size(); j++) {
-			eva_puntuacion[j] = Double.parseDouble(getHTML("http://memento.evannai.inf.uc3m.es/age/qesf/?c=" + population.get(j).getRoot().inorder_string()));
-		}*/
-		//System.out.println(eva_puntuacion[1]);
+			
+			try {
+				String respuestaWeb = getHTML("http://memento.evannai.inf.uc3m.es/age/qesf/?c=" + population.get(j).getRoot().inorder_string());
+				if(respuestaWeb.equals("+inf") || respuestaWeb.equals("+inf")  || respuestaWeb.equals("An error was found. Please, check the mathematical expression")) {
+					eva_puntuacion[j]=9999999.0;//Penalizacion
+				}else {
+					eva_puntuacion[j] = Double.parseDouble(getHTML("http://memento.evannai.inf.uc3m.es/age/qesf/?c=" + population.get(j).getRoot().inorder_string()));
+				}
+			} catch (Exception e) {
+				eva_puntuacion[j]=9999999.0;//Penalizacion
+			}
+			
+			System.out.println("Obtiene "+eva_puntuacion[j]+" la cadena "+population.get(j).getRoot().inorder_string());
+		}
+		System.out.println(eva_puntuacion[1]);
+		*/
 		
 		//*************************************SELECTION*************************************
 
