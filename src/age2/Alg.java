@@ -20,7 +20,7 @@ public class Alg {
 
 	
 	// trees' maximum depth
-	static int MAX_DEPTH = 20;
+	static int MAX_DEPTH = 10;
 	// population's size
 	static int POPULATION_SIZE = 10; 
 	
@@ -74,7 +74,7 @@ public class Alg {
 			Node currentNode = population.get(i).getRoot();
 			int toReach = rnd.nextInt(population.get(i).height());
 			
-			for(int j=0; j<=toReach; j++){
+			for(int j=0; j<toReach; j++){
 				
 				/* if currentNode is a terminal, we need to stop the process and establish it 
 				 * as one of the sub-tree's roots
@@ -94,18 +94,47 @@ public class Alg {
 		} // i-for's end
 
 		/* Once we have our sub-tree's root we just have to swap their parents
-		 * Exception: when one of the sub-tree's root is the main root of the tree (treated at E#1)
+		 * Exception: when one of the sub-tree's root is the main root of the tree (treated at E#1) -NOT IMPLEMENTED YET
 		 */ 
-
-		// #1 we swap the parent's references
-		Node aux = subTRoots[0].parent;
-		subTRoots[0].parent = subTRoots[1];
-		subTRoots[1].parent = aux;
 		
-		// #2 we establish the proper offspring references to these parents
-		subTRoots[0].parent.setOneSon(subTRoots[0], descIndexes[1]);
-		subTRoots[1].parent.setOneSon(subTRoots[1], descIndexes[0]);
+		/* Here we are counting the number of previously selected nodes with no father (= which are the main root of the tree)
+		 * ctr stores the number of occurrences
+		 * which stores the index of the last node of the array in which this happens
+		 */
+		int ctr=0;
+		int which = 0;
+		for(int i=0; i<subTRoots.length; i++){
+			if(subTRoots[i].parent==null){
+				ctr= ctr + 1;
+				which = i;
+			}
+		}
+		
+		if(ctr == 0){
+		// if there aren't no-father nodes in the array...
+			
+			// #1 we swap the parent's references
+			Node aux = subTRoots[0].parent;		
+			subTRoots[0].parent = subTRoots[1].parent;
+			subTRoots[1].parent = aux;
 
+			// #2 we establish the proper offspring references to these parents
+			subTRoots[0].parent.setOneSon(subTRoots[0], descIndexes[1]);
+			subTRoots[1].parent.setOneSon(subTRoots[1], descIndexes[0]);
+		
+		 // (E#1)
+		}else if(ctr == 1){
+		// if there's one no-father node in the array...
+
+			// #1 we swap the parent's references	
+			subTRoots[which].parent = subTRoots[which^1].parent;
+			subTRoots[which^1].parent = null;
+			
+			// #2 we establish the proper offspring references to these parents
+			subTRoots[which].parent.setOneSon(subTRoots[which], descIndexes[which^1]);
+			population.get(which).setRoot(subTRoots[which^1]); // the other sub-tree will now be a full-tree
+		}
+		
 		System.out.println("\nRESULTADO");
 		System.out.println(population.get(0).getRoot().inorder_string()+","+population.get(0).getRoot().height());
 		System.out.println(population.get(1).getRoot().inorder_string()+","+population.get(1).getRoot().height());
