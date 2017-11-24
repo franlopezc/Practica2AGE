@@ -7,23 +7,20 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Random;
 
-
-
-
-
-
-
 // IMPORT OUR TREE PACKAGE
 import treeStr.*;
 
 public class Alg {
 
-	
 	// trees' maximum depth
 	static int MAX_DEPTH = 10;
 	// population's size
 	static int POPULATION_SIZE = 10; 
-	
+	// crossover probability
+	static double pc = 0.7;
+	// mutation probability
+	static double pm = 0.01;
+		
 	static String[] binOperators = {"+", "-", "/", "*", "**"};
 	static String[] unOperators = {"sqrt"};
 	static String[] terminals = {"a", "b", "c", "constant"};
@@ -66,95 +63,116 @@ public class Alg {
 		//*************************************SELECTION*************************************
 
 		
-		//*************************************CROSSOVER - test version*************************************
-		System.out.println("ÁRBOLES QUE SE VAN A CRUZAR");
-		System.out.println(population.get(0).getRoot().inorder_string()+","+population.get(0).getRoot().height());
-		System.out.println(population.get(1).getRoot().inorder_string()+","+population.get(1).getRoot().height());
+		//*************************************CROSSOVER*************************************
 		
-		/* "selected" parents (for the final version, this should be an array/list containing the selected 
-		 * parents from the previous selection process)
-		 */
-		//Tree[] ind = {population.get(0), population.get(1)};
+		int[] indexes = null /* Selection method would ideally return this array filled with the indexes for the population arraylist
+		which contain the selected individuals */;
 		
-		// sub-tree's root from each of the parents (these will be crossed)
-		Node[] subTRoots = new Node[2];
-		// this array will store the index of the parent's descendant to be crossed
-		int[] descIndexes = new int[2];
+		ArrayList<Tree> offspring = crossover(indexes, population);
+		
+		//*************************************END OF CROSSOVER*************************************
+		
+	} // main
+	
+	
+	public static ArrayList<Tree> crossover (int[] indexes, ArrayList<Tree> pop){
+		
+		ArrayList<Tree> offspring = new ArrayList<Tree>();
 		
 		Random rnd = new Random();
 		
-		for(int i=0; i<2; i++){
+		// we take two parents at each step to cross them (that's why the increment in the for loop is 'k+2'
+		for(int k=0; k<indexes.length; k=k+2){
 			
-			Node currentNode = population.get(i).getRoot();
-			int toReach = rnd.nextInt(population.get(i).height());
+			ArrayList<Tree> toCross = new ArrayList<Tree>();
+			toCross.add(pop.get(indexes[k]));
+			toCross.add(pop.get(indexes[k+1]));
 			
-			for(int j=0; j<toReach; j++){
+			// crossover will only happen with 'pc' probability
+			if(rnd.nextDouble() <= pc){
 				
-				/* if currentNode is a terminal, we need to stop the process and establish it 
-				 * as one of the sub-tree's roots
-				 */
-				if(currentNode.sons_needed == 0){
-					break;
-				}else{ // in other case, we keep going through the tree
-					descIndexes[i] = rnd.nextInt(currentNode.sons_needed); 
-					currentNode = currentNode.getSons()[descIndexes[i]];
+				// sub-tree's root from each of the parents (these will be crossed)
+				Node[] subTRoots = new Node[2];
+				// this array will store the index of the parent's descendant to be crossed
+				int[] descIndexes = new int[2];
+				
+				for(int i=0; i<2; i++){
+					
+					Node currentNode = toCross.get(i).getRoot();
+					int toReach = rnd.nextInt(toCross.get(i).height());
+			
+					for(int j=0; j<toReach; j++){
+				
+						/* if currentNode is a terminal, we need to stop the process and establish it 
+					 	* as one of the sub-tree's roots
+					 	*/
+						if(currentNode.sons_needed == 0){
+							break;
+						}else{ // in other case, we keep going through the tree
+							descIndexes[i] = rnd.nextInt(currentNode.sons_needed); 
+							currentNode = currentNode.getSons()[descIndexes[i]];
+						}
+						
+					} // j for's end
+					
+					// we set the last node we were in as one of the sub-tree's roots
+					subTRoots[i] = currentNode;
+					
+				} // i-for's end
+
+				/* Once we have our sub-tree's root we just have to swap their parents
+			 	* Exception: when one of the sub-tree's root is the main root of the tree (treated at E#1) -NOT IMPLEMENTED YET
+			 	*/ 
+				
+				/* Here we are counting the number of previously selected nodes with no father (= which are the main root of the tree)
+			 	* ctr stores the number of occurrences
+			 	* which stores the index of the last node of the array in which this happens
+			 	*/
+				int ctr=0;
+				int which = 0;
+				for(int i=0; i<subTRoots.length; i++){
+					if(subTRoots[i].parent==null){
+						ctr= ctr + 1;
+						which = i;
+					}
 				}
 				
-			} // j for's end
-			
-			// we set the last node we were in as one of the sub-tree's roots
-			subTRoots[i] = currentNode;
-			
-		} // i-for's end
+				if(ctr == 0){
+					// if there aren't no-father nodes in the array...
+					
+					// #1 we swap the parent's references
+					Node aux = subTRoots[0].parent;		
+					subTRoots[0].parent = subTRoots[1].parent;
+					subTRoots[1].parent = aux;
 
-		/* Once we have our sub-tree's root we just have to swap their parents
-		 * Exception: when one of the sub-tree's root is the main root of the tree (treated at E#1) -NOT IMPLEMENTED YET
-		 */ 
-		
-		/* Here we are counting the number of previously selected nodes with no father (= which are the main root of the tree)
-		 * ctr stores the number of occurrences
-		 * which stores the index of the last node of the array in which this happens
-		 */
-		int ctr=0;
-		int which = 0;
-		for(int i=0; i<subTRoots.length; i++){
-			if(subTRoots[i].parent==null){
-				ctr= ctr + 1;
-				which = i;
-			}
-		}
-		
-		if(ctr == 0){
-		// if there aren't no-father nodes in the array...
-			
-			// #1 we swap the parent's references
-			Node aux = subTRoots[0].parent;		
-			subTRoots[0].parent = subTRoots[1].parent;
-			subTRoots[1].parent = aux;
+					// #2 we establish the proper offspring references to these parents
+					subTRoots[0].parent.setOneSon(subTRoots[0], descIndexes[1]);
+					subTRoots[1].parent.setOneSon(subTRoots[1], descIndexes[0]);
+				
+				 // (E#1)
+				}else if(ctr == 1){
+				// if there's one no-father node in the array...
 
-			// #2 we establish the proper offspring references to these parents
-			subTRoots[0].parent.setOneSon(subTRoots[0], descIndexes[1]);
-			subTRoots[1].parent.setOneSon(subTRoots[1], descIndexes[0]);
-		
-		 // (E#1)
-		}else if(ctr == 1){
-		// if there's one no-father node in the array...
-
-			// #1 we swap the parent's references	
-			subTRoots[which].parent = subTRoots[which^1].parent;
-			subTRoots[which^1].parent = null;
+					// #1 we swap the parent's references	
+					subTRoots[which].parent = subTRoots[which^1].parent;
+					subTRoots[which^1].parent = null;
+					
+					// #2 we establish the proper offspring references to these parents
+					subTRoots[which].parent.setOneSon(subTRoots[which], descIndexes[which^1]);
+					toCross.get(which).setRoot(subTRoots[which^1]); // the other sub-tree will now be a full-tree
+				}
+				
+			} // end of if rnd < pc
 			
-			// #2 we establish the proper offspring references to these parents
-			subTRoots[which].parent.setOneSon(subTRoots[which], descIndexes[which^1]);
-			population.get(which).setRoot(subTRoots[which^1]); // the other sub-tree will now be a full-tree
-		}
+			// we add the individuals to the offspring after the correspondent processing
+			offspring.add(toCross.get(0));
+			offspring.add(toCross.get(1));
+			
+		} // end of indexes for
 		
-		System.out.println("\nRESULTADO");
-		System.out.println(population.get(0).getRoot().inorder_string()+","+population.get(0).getRoot().height());
-		System.out.println(population.get(1).getRoot().inorder_string()+","+population.get(1).getRoot().height());
-		//*************************************END OF CROSSOVER - test version*************************************
-		
-	} // main
+		return offspring;
+	}
+	
 	
 	public static ArrayList<Tree> generatePop (){
 		
@@ -261,6 +279,7 @@ public class Alg {
 		
 		return population;
 	}
+	
 	
 	public static String getHTML(String urlToRead) throws Exception {
 		StringBuilder result = new StringBuilder();
